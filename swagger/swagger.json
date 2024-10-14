@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Product List Service API",
+    "description": "API documentation for the serverless product list service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{api-id}.execute-api.{region}.amazonaws.com/prod",
+      "description": "AWS API Gateway",
+      "variables": {
+        "api-id": {
+          "default": "1n8cvbx0zf"
+        },
+        "region": {
+          "default": "us-east-1"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "Get all products",
+        "description": "Retrieves a list of products from the product service",
+        "responses": {
+          "200": {
+            "description": "A successful response with the product list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Get a specific product by its ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the product to retrieve",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details for the given ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Product description"
+          },
+          "id": {
+            "type": "string",
+            "example": "7567ec4b-b10c-48c5-9345-fc73c48a80a1"
+          },
+          "price": {
+            "type": "number",
+            "example": 49.99
+          },
+          "title": {
+            "type": "string",
+            "example": "Product title"
+          },
+          "count": {
+            "type": "number",
+            "example": 2
+          }
+        }
+      }
+    }
+  }
+}
