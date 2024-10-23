@@ -5,6 +5,11 @@ import * as cdk from 'aws-cdk-lib';
 import * as path from 'path';
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from 'constructs';
+import {
+  corsIntegrationResponseParameters,
+  corsMethodResponseParameters,
+  defaultCorsPreflightOptions, defaultErrorIntegrationResponse
+} from "./constants";
 
 const PRODUCT_TABLE = 'PRODUCT';
 const STOCK_TABLE = 'STOCK_TABLE';
@@ -20,27 +25,6 @@ const createLambdaFunctionHelper = (context: cdk.Stack, id: string, entry: strin
     STOCK_TABLE,
   },
 });
-
-const corsIntegrationResponseParameters = {
-  'method.response.header.Access-Control-Allow-Origin': "'*'",
-  'method.response.header.Access-Control-Allow-Methods': "'GET, OPTIONS'",
-  'method.response.header.Access-Control-Allow-Headers': "'*'",
-}
-
-const corsMethodResponseParameters = {
-  'method.response.header.Access-Control-Allow-Origin': true,
-  'method.response.header.Access-Control-Allow-Methods': true,
-  'method.response.header.Access-Control-Allow-Headers': true,
-}
-
-const defaultErrorIntegrationResponse = {
-  statusCode: '500',
-  selectionPattern: '(\n|.)+',
-  responseTemplates: {
-    'application/json': '{"message": "Internal server error"}',
-  },
-  responseParameters: corsIntegrationResponseParameters,
-}
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -76,11 +60,7 @@ export class ProductServiceStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, "ProductsApi", {
       restApiName: "Products Service",
       description: "This service serves products.",
-      defaultCorsPreflightOptions: {
-        allowHeaders: ['*'],
-        allowOrigins: ['*'],
-        allowMethods: ['GET', 'OPTIONS'],
-      }
+      defaultCorsPreflightOptions,
     });
 
     const productsResource = api.root.addResource('products');

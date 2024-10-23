@@ -1,0 +1,53 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "File Import API",
+    "description": "Service that provides a signed URL to upload files",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://gvgpzvmo1j.execute-api.us-east-1.amazonaws.com/prod",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/import": {
+      "get": {
+        "summary": "Get a signed URL to upload a file",
+        "operationId": "getSignedUrl",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "hello_world.png"
+            },
+            "description": "The name of the file to be uploaded"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed URL returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                   "example": "https://importservicestack-importservicebucketc18e9128-fby0njbkmsct.s3.us-east-1.amazonaws.com/uploaded/hello_world.png"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request, missing or invalid filename parameter"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}

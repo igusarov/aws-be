@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
-const fs = require('fs');
-const path = require('path');
-const swaggerDocument = require('./swagger.json')
+const swaggerDocument = process.env.service === 'product' ?
+  require('./productService.json') :
+  require('./importService.json');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
