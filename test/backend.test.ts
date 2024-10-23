@@ -3,11 +3,11 @@
 // import * as Backend from '../lib/backend-stack';
 
 // example test. To run these tests, uncomment this file along with the
-// example resource in lib/backend-stack.ts
+// example resource in lib/product-service-stack.ts
 test('SQS Queue Created', () => {
 //   const app = new cdk.App();
 //     // WHEN
-//   const stack = new Backend.BackendStack(app, 'MyTestStack');
+//   const stack = new Backend.ProductServiceStack(app, 'MyTestStack');
 //     // THEN
 //   const template = Template.fromStack(stack);
 

@@ -14,5 +14,5 @@ const mockProductItem = {
 jest.mocked(getAllProducts).mockResolvedValue([mockProductItem]);
 
 test('getProductList.handler should return products', async () => {
-  expect(await handler()).toEqual([mockProductItem]);
+  expect(await handler({})).toEqual([mockProductItem]);
 })

@@ -11,7 +11,7 @@
       "description": "AWS API Gateway",
       "variables": {
         "api-id": {
-          "default": "1n8cvbx0zf"
+          "default": "4gqsh9pob6"
         },
         "region": {
           "default": "us-east-1"
@@ -37,6 +37,62 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new product",
+        "operationId": "createProduct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the product.",
+                    "example": "Awesome Product"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A brief description of the product.",
+                    "example": "This product is awesome because..."
+                  },
+                  "price": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "The price of the product.",
+                    "example": 29.99
+                  },
+                  "count": {
+                    "type": "integer",
+                    "description": "The available stock count for the product.",
+                    "example": 100
+                  }
+                },
+                "required": ["title", "price", "count"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error: count must be positive"
           },
           "500": {
             "description": "Internal server error"

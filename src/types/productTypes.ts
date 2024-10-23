@@ -3,5 +3,8 @@ export type Product = {
   title: string;
   description: string;
   price: number;
-  count: number;
 }
+
+export type ProductWithStock = Product & { count: number };
+
+export type CreateProductPayload = Omit<ProductWithStock, 'id'>;
