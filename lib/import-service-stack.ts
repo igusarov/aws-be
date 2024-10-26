@@ -13,9 +13,10 @@ import {
   defaultErrorIntegrationResponse
 } from "./constants";
 import { HttpMethods } from "aws-cdk-lib/aws-s3";
+import { ProductServiceStack } from "./product-service-stack";
 
 export class ImportServiceStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, productServiceStack: ProductServiceStack, props?: cdk.StackProps) {
     super(scope, id, props);
 
     const bucket = new aws_s3.Bucket(this, 'ImportServiceBucket', {
@@ -50,12 +51,14 @@ export class ImportServiceStack extends cdk.Stack {
       handler: 'handler',
       environment: {
         BUCKET_NAME: bucket.bucketName,
+        CATALOG_ITEMS_QUEUE_URL: productServiceStack.catalogItemsQueue.queueUrl,
       }
     });
 
     bucket.grantWrite(importProductsFileLambda);
     bucket.grantReadWrite(importFileParserLambda);
     bucket.grantDelete(importFileParserLambda);
+    productServiceStack.catalogItemsQueue.grantSendMessages(importFileParserLambda);
 
     bucket.addObjectCreatedNotification(new notifications.LambdaDestination(importFileParserLambda), {
       prefix: 'uploaded/',
