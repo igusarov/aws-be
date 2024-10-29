@@ -1,3 +1,4 @@
+import 'dotenv/config.js';
 import * as cdk from 'aws-cdk-lib';
 import { aws_s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -55,6 +56,22 @@ export class ImportServiceStack extends cdk.Stack {
       }
     });
 
+    const basicAuthorizerLambda = new nodeJsLambda.NodejsFunction(this, 'BasicAuthorizerLambda', {
+      entry: path.join(__dirname, '../src/handlers/basicAuthorizer.ts'),
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      handler: 'handler',
+      environment: {
+        LOGIN: process.env.LOGIN || '',
+        PASSWORD: process.env.PASSWORD || '',
+      }
+    });
+
+    const basicAuthorizer = new apigateway.TokenAuthorizer(this, 'ApiAuthorizer', {
+      handler: basicAuthorizerLambda,
+    })
+
     bucket.grantWrite(importProductsFileLambda);
     bucket.grantReadWrite(importFileParserLambda);
     bucket.grantDelete(importFileParserLambda);
@@ -72,6 +89,21 @@ export class ImportServiceStack extends cdk.Stack {
 
     const importResource = api.root.addResource('import');
 
+
+    api.addGatewayResponse('AccessDeniedResponse', {
+      type: apigateway.ResponseType.ACCESS_DENIED,
+      responseHeaders: corsIntegrationResponseParameters,
+      statusCode: '403',
+      templates: { 'application/json': '{"message": $context.error.messageString}' },
+    });
+
+    api.addGatewayResponse('UnauthorizedResponse', {
+      type: apigateway.ResponseType.UNAUTHORIZED,
+      responseHeaders: corsIntegrationResponseParameters,
+      statusCode: '401',
+      templates: { 'application/json': '{"message": "Unauthorized - Token invalid or missing"}' },
+    });
+
     importResource.addMethod('GET', new apigateway.LambdaIntegration(importProductsFileLambda, {
       requestTemplates: {
         'application/json': `{ "filename": "$input.params('filename')" }`
@@ -85,6 +117,8 @@ export class ImportServiceStack extends cdk.Stack {
       ],
       proxy: false,
     }), {
+      authorizer: basicAuthorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
       requestParameters: {
         'method.request.querystring.filename': true,
       },
